@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 interface Category {
@@ -21,7 +21,7 @@ export default function AdminCategoriesPage() {
   const [catDescription, setCatDescription] = useState("");
   const [catIcon, setCatIcon] = useState("📝");
   const [newTag, setNewTag] = useState("");
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     fetchData();

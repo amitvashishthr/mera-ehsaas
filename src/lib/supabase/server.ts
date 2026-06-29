@@ -1,6 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+/**
+ * Creates a Supabase client for Server Components and Route Handlers.
+ * Uses the cookie store to maintain auth session.
+ * Must be called within a request context (Server Component, Route Handler, Server Action).
+ */
 export async function createServerSupabaseClient() {
   const cookieStore = await cookies();
 
@@ -18,8 +23,8 @@ export async function createServerSupabaseClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing sessions.
+            // setAll called from Server Component — safe to ignore.
+            // Middleware handles session refresh.
           }
         },
       },

@@ -78,9 +78,7 @@ export function CommentSection({ postId, postAuthorId, currentUserId, initialCom
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "comments", filter: `post_id=eq.${postId}` },
         async (payload) => {
-          const exists = comments.some((c) => c.id === payload.new.id);
-          if (exists) return;
-
+          // Fetch full comment with profile data
           const { data } = await supabase
             .from("comments")
             .select(`*, profiles:user_id(id, username, full_name, avatar_url)`)

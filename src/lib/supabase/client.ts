@@ -1,5 +1,10 @@
 import { createBrowserClient } from "@supabase/ssr";
 
+/**
+ * Creates a Supabase browser client.
+ * In components, wrap with useMemo to prevent recreation on every render:
+ * `const supabase = useMemo(() => createClient(), []);`
+ */
 export function createClient() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
