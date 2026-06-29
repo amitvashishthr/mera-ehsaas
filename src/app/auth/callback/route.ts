@@ -1,6 +1,13 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
+/**
+ * Auth callback handler for all Supabase auth flows:
+ * - Google OAuth (PKCE code exchange)
+ * - Email Magic Link (PKCE code exchange)
+ * - Email verification (PKCE code or token_hash)
+ * - Password reset (PKCE code → redirect to /reset-password)
+ */
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
@@ -20,19 +27,25 @@ export async function GET(request: Request) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      // If this was a password recovery, redirect to reset page
-      const redirectTo = type === "recovery" ? "/reset-password" : next;
-      return NextResponse.redirect(`${origin}${redirectTo}`);
-    }
-  }
-
-  // Implicit / email verification flow: verify OTP token hash
-  if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({ token_hash, type });
-    if (!error) {
+      // Password recovery → redirect to reset page
+      if (type === "recovery") {
+        return NextResponse.redirect(`${origin}/reset-password`);
+      }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
 
+  // Token hash flow (older email verification format)
+  if (token_hash && type) {
+    const { error } = await supabase.auth.verifyOtp({ token_hash, type });
+    if (!error) {
+      if (type === "recovery") {
+        return NextResponse.redirect(`${origin}/reset-password`);
+      }
+      return NextResponse.redirect(`${origin}${next}`);
+    }
+  }
+
+  // Auth failed — redirect with error
   return NextResponse.redirect(`${origin}/login?error=auth_failed`);
 }

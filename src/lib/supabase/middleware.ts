@@ -1,6 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/**
+ * Middleware to manage Supabase auth sessions and route protection.
+ * - Refreshes auth tokens via cookies
+ * - Protects authenticated routes (redirects to /login)
+ * - Protects admin routes
+ * - Redirects logged-in users away from auth pages
+ */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -29,38 +36,37 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect unauthenticated users away from protected routes
-  const protectedPaths = ["/dashboard", "/profile", "/collections", "/print-request"];
-  const isProtected = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const pathname = request.nextUrl.pathname;
 
-  if (!user && isProtected) {
+  // Public routes that do NOT require authentication
+  const publicPaths = [
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+    "/auth/callback",
+  ];
+  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
+
+  // If not authenticated and not on a public page, redirect to login
+  if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages (but not forgot/reset-password)
-  const authPaths = ["/login", "/signup"];
-  const isAuthPage = authPaths.some((path) =>
-    request.nextUrl.pathname === path
-  );
-
-  if (user && isAuthPage) {
+  // If authenticated and on login/signup, redirect to home
+  if (user && (pathname === "/login" || pathname === "/signup")) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
   // Admin route protection
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    if (!user) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      return NextResponse.redirect(url);
-    }
-    // Additional admin check would happen at page level via profile role
+  if (pathname.startsWith("/admin") && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
   }
 
   return supabaseResponse;
