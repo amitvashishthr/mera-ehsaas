@@ -6,46 +6,41 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "MeraEhsaas — A Space for Poetry & Emotions",
-  description: "Share poetry, shayari, stories, and heartfelt thoughts with a community that feels.",
+  title: "MeraEhsaas — Poetry & Emotions",
+  description: "A quiet space to share poetry, shayari, stories, and heartfelt thoughts.",
+  openGraph: {
+    title: "MeraEhsaas",
+    description: "A quiet space for poetry & emotions",
+    type: "website",
+  },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Source+Sans+3:wght@300;400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
           rel="stylesheet"
         />
-        {/* Prevent FOUC for dark mode */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var t = localStorage.getItem('meraehsaas-theme');
-                if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.documentElement.classList.add('dark');
-                }
-              })();
-            `,
+            __html: `(function(){var t=localStorage.getItem('meraehsaas-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}})();`,
           }}
         />
       </head>
-      <body className="font-body">
+      <body className="font-sans">
         <ThemeProvider>
           <ToastProvider>
-            <Navbar />
-            <div className="min-h-screen pt-16">
-              <div className="layout-container flex gap-0">
-                <Sidebar />
-                <main className="flex-1 min-w-0 py-6 md:py-10 lg:pl-10">
+            <div className="flex min-h-screen">
+              {/* Desktop sidebar */}
+              <Sidebar />
+              {/* Main area */}
+              <div className="flex-1 flex flex-col min-w-0">
+                <Navbar />
+                <main className="flex-1 pb-20 md:pb-8">
                   {children}
                 </main>
               </div>
