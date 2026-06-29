@@ -20,7 +20,9 @@ export async function GET(request: Request) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      // If this was a password recovery, redirect to reset page
+      const redirectTo = type === "recovery" ? "/reset-password" : next;
+      return NextResponse.redirect(`${origin}${redirectTo}`);
     }
   }
 

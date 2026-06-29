@@ -41,10 +41,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from auth pages
+  // Redirect authenticated users away from auth pages (but not forgot/reset-password)
   const authPaths = ["/login", "/signup"];
   const isAuthPage = authPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
+    request.nextUrl.pathname === path
   );
 
   if (user && isAuthPage) {
