@@ -49,6 +49,7 @@ export async function updateSession(request: NextRequest) {
     "/privacy",
     "/terms",
     "/about",
+    "/delete-account",
   ];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
