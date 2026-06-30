@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
   plugins: {
     SplashScreen: {
       launchAutoHide: true,
-      launchShowDuration: 2000,
+      launchShowDuration: 1500,
       backgroundColor: "#f8f6f4",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
@@ -19,21 +19,25 @@ const config: CapacitorConfig = {
       splashFullScreen: true,
       splashImmersive: true,
     },
-    PushNotifications: {
-      presentationOptions: ["badge", "sound", "alert"],
+    StatusBar: {
+      style: "LIGHT" as any,
+      backgroundColor: "#f8f6f4",
+      overlaysWebView: true,
     },
     Keyboard: {
       resize: "body" as any,
-      style: "dark" as any,
       resizeOnFullScreen: true,
     },
-    StatusBar: {
-      style: "dark",
-      backgroundColor: "#f8f6f4",
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"],
     },
-    Browser: {
-      // For OAuth flows
+    Browser: {},
+    Camera: {
+      presentationStyle: "fullscreen" as any,
     },
+    Preferences: {},
+    Network: {},
+    Haptics: {},
   },
   android: {
     allowMixedContent: false,

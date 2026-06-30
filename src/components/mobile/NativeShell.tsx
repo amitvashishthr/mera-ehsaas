@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
 
 /**
  * NativeShell handles all Capacitor-specific native behaviors.
- * Only active when running inside a native app (checks for Capacitor).
- * Does nothing in web browsers.
+ * Only runs inside a native Capacitor app — does nothing in web browsers.
  */
 export function NativeShell() {
   const router = useRouter();
@@ -16,22 +15,28 @@ export function NativeShell() {
 
   const isNative = typeof window !== "undefined" && !!(window as any).Capacitor;
 
-  // Status bar + safe areas
+  // Initialize native plugins
   useEffect(() => {
     if (!isNative) return;
 
-    async function setupNative() {
+    async function init() {
       try {
-        const { StatusBar, Style } = await import("@capacitor/status-bar");
+        const { StatusBar } = await import("@capacitor/status-bar");
         const { Keyboard } = await import("@capacitor/keyboard");
         const { App } = await import("@capacitor/app");
+        const { Network } = await import("@capacitor/network");
+        const { SplashScreen } = await import("@capacitor/splash-screen");
 
-        // Status bar — transparent overlay
+        // Hide splash after load
+        await SplashScreen.hide();
+
+        // Status bar — overlay for immersive feel
         await StatusBar.setOverlaysWebView({ overlay: true });
         const isDark = document.documentElement.classList.contains("dark");
+        const { Style } = await import("@capacitor/status-bar");
         await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
 
-        // Keyboard — adjust viewport, don't scroll
+        // Keyboard handling
         Keyboard.addListener("keyboardWillShow", () => {
           document.body.classList.add("keyboard-open");
         });
@@ -39,36 +44,41 @@ export function NativeShell() {
           document.body.classList.remove("keyboard-open");
         });
 
-        // Android back button
+        // Android hardware back button
         App.addListener("backButton", ({ canGoBack }) => {
-          if (canGoBack) {
-            router.back();
-          } else {
-            App.exitApp();
-          }
+          if (canGoBack) router.back();
+          else App.exitApp();
         });
 
-        // App state — handle resume
+        // Resume from background — refresh data
         App.addListener("appStateChange", ({ isActive }) => {
-          if (isActive) {
-            router.refresh();
-          }
+          if (isActive) router.refresh();
         });
 
         // Deep links
         App.addListener("appUrlOpen", ({ url }) => {
-          const path = new URL(url).pathname;
-          if (path) router.push(path);
+          try {
+            const path = new URL(url).pathname;
+            if (path) router.push(path);
+          } catch {}
         });
-      } catch (e) {
-        // Plugins not available — running in web
-      }
+
+        // Network monitoring
+        Network.addListener("networkStatusChange", ({ connected }) => {
+          if (connected) {
+            showToast("Back online", "success");
+            router.refresh();
+          } else {
+            showToast("You're offline", "info");
+          }
+        });
+      } catch {}
     }
 
-    setupNative();
-  }, [isNative, router]);
+    init();
+  }, [isNative, router, showToast]);
 
-  // Theme changes → update status bar
+  // Theme change → update status bar style
   useEffect(() => {
     if (!isNative) return;
 
@@ -84,30 +94,10 @@ export function NativeShell() {
     return () => observer.disconnect();
   }, [isNative]);
 
-  // Network reconnect
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const handleOnline = () => {
-      showToast("Back online", "success");
-      router.refresh();
-    };
-    const handleOffline = () => {
-      showToast("You're offline", "info");
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, [showToast, router]);
-
   // Remember last page
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (pathname && pathname !== "/login" && pathname !== "/signup") {
+    if (pathname && !["/login", "/signup", "/forgot-password", "/reset-password"].includes(pathname)) {
       sessionStorage.setItem("meraehsaas-last-page", pathname);
     }
   }, [pathname]);
