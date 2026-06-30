@@ -138,3 +138,68 @@ button, a, [role="button"] {
     user-select: text;
   }
 }
+
+
+/* === NATIVE MOBILE ENHANCEMENTS === */
+
+/* Prevent zoom on input focus (iOS) */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Prevent white flash during page transitions */
+html {
+  background-color: #f8f6f4;
+}
+html.dark {
+  background-color: #0f0f0f;
+}
+
+/* Keyboard open state */
+body.keyboard-open {
+  /* Prevent viewport shift on keyboard open */
+  height: 100vh !important;
+  overflow: hidden;
+}
+body.keyboard-open main {
+  padding-bottom: 0 !important;
+}
+
+/* Native-like momentum scrolling */
+main, [data-scroll] {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Touch ripple feedback */
+@media (pointer: coarse) {
+  .btn, .btn-primary, .btn-secondary, .btn-outline, .btn-ghost, .btn-icon,
+  .nav-link, .nav-link-active, .card-interactive, button {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn:active, .btn-primary:active, .btn-secondary:active,
+  .btn-outline:active, .btn-ghost:active, .btn-icon:active,
+  .nav-link:active, .card-interactive:active {
+    opacity: 0.7;
+    transition: opacity 0.1s;
+  }
+}
+
+/* Disable text selection on nav elements in native */
+@media (display-mode: standalone) {
+  nav, header, footer, aside {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Smooth page transitions */
+main {
+  animation: pageIn 0.2s ease-out;
+}
+@keyframes pageIn {
+  from { opacity: 0.96; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

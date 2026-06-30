@@ -5,6 +5,8 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
+import { NativeShell } from "@/components/mobile/NativeShell";
+import { PullToRefresh } from "@/components/mobile/PullToRefresh";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -66,14 +68,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans overscroll-none">
         <ThemeProvider>
           <ToastProvider>
+            <NativeShell />
             <div className="flex min-h-screen">
-              {/* Desktop sidebar */}
               <Sidebar />
-              {/* Main area */}
               <div className="flex-1 flex flex-col min-w-0">
                 <Navbar />
                 <main className="flex-1 pb-20 md:pb-8">
-                  {children}
+                  <PullToRefresh>
+                    {children}
+                  </PullToRefresh>
                 </main>
               </div>
             </div>
