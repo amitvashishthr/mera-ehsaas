@@ -141,6 +141,32 @@ export default function ProfilePage() {
     setUploading(false);
   };
 
+  const handleRemoveAvatar = async () => {
+    if (!profile || !avatarUrl) return;
+    if (!confirm("Remove your profile picture?")) return;
+    setUploading(true);
+
+    // Extract file path from the public URL
+    const urlParts = avatarUrl.split("/storage/v1/object/public/avatars/");
+    if (urlParts[1]) {
+      await supabase.storage.from("avatars").remove([urlParts[1]]);
+    }
+
+    // Clear avatar_url in profile
+    const { error } = await supabase
+      .from("profiles")
+      .update({ avatar_url: null })
+      .eq("id", profile.id);
+
+    if (error) {
+      showToast("Failed to remove avatar", "error");
+    } else {
+      setAvatarUrl(null);
+      showToast("Avatar removed", "success");
+    }
+    setUploading(false);
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
@@ -250,6 +276,21 @@ export default function ProfilePage() {
                   onChange={handleAvatarUpload}
                   className="hidden"
                 />
+                {/* Remove avatar button */}
+                {avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    disabled={uploading}
+                    className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors shadow-sm"
+                    aria-label="Remove avatar"
+                    title="Remove avatar"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               {/* Quick info */}
