@@ -46,6 +46,9 @@ export async function updateSession(request: NextRequest) {
     "/reset-password",
     "/auth/callback",
     "/offline",
+    "/privacy",
+    "/terms",
+    "/about",
   ];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
