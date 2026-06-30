@@ -66,7 +66,17 @@
 
   /* Skeleton */
   .skeleton {
-    @apply bg-neutral-100 dark:bg-neutral-800 rounded-lg animate-pulse;
+    @apply bg-neutral-100 dark:bg-neutral-800 rounded-lg relative overflow-hidden;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+  .dark .skeleton::after {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
   }
 
   /* Layout */
@@ -202,4 +212,43 @@ main {
 @keyframes pageIn {
   from { opacity: 0.96; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Shimmer animation for skeletons */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Improved button press feedback */
+.btn:active, .btn-primary:active, .btn-secondary:active, .btn-outline:active {
+  transform: scale(0.97);
+  transition-duration: 0.1s;
+}
+
+/* Tablet layout improvements */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .max-w-feed { max-width: 600px; }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  main { animation: none !important; }
+}
+
+/* Better image loading */
+img {
+  content-visibility: auto;
+}
+
+/* Print styles */
+@media print {
+  nav, aside, footer, .btn, button { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .card { border: 1px solid #ddd !important; box-shadow: none !important; }
 }
