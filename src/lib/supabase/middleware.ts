@@ -50,6 +50,7 @@ export async function updateSession(request: NextRequest) {
     "/terms",
     "/about",
     "/delete-account",
+    "/licenses",
   ];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 

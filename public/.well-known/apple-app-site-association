@@ -1,0 +1,19 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["TEAMID.com.meraehsaas.app"],
+        "paths": ["/posts/*", "/user/*", "/category/*", "/collections/*"],
+        "components": [
+          { "/": "/posts/*" },
+          { "/": "/user/*" },
+          { "/": "/category/*" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAMID.com.meraehsaas.app"]
+  }
+}
